@@ -7,21 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependency directories
 node_modules
 dist
 dist-ssr
 *.local
-
-# Python cache files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environments
-venv/
-env/
 
 # Editor directories and files
 .vscode/*
@@ -33,6 +22,5 @@ env/
 *.njsproj
 *.sln
 *.sw?
-
-# Environment variables
 .env
+.bolt/
