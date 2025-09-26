@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aarogya Sahayak</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js for Vitals Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #1a202c;
+        }
+        .mobile-frame {
+            max-width: 420px;
+            height: 90vh;
+            margin: 2rem auto;
+            border: 12px solid #333;
+            border-radius: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            background-color: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .screen-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        .screen-content::-webkit-scrollbar {
+            display: none;
+        }
+        .nav-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .nav-button:hover {
+            color: #1a73e8;
+            transform: translateY(-2px);
+        }
+        .nav-button.active {
+            color: #1a73e8;
+        }
+        .card {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        .action-button {
+            background-color: #63b3ed;
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .action-button:hover {
+            background-color: #4299e1;
+        }
+        .modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+        }
+        .chat-bubble {
+            max-width: 75%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+        }
+        .chat-bubble.sent {
+            background-color: #e2e8f0;
+            color: #1a202c;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+        .chat-bubble.received {
+            background-color: #63b3ed;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Mobile Frame -->
+    <div class="mobile-frame">
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="absolute inset-0 bg-white flex items-center justify-center flex-col z-50">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            <p id="loading-text" class="mt-4 text-blue-600 font-semibold" data-lang-key="loggingIn">Initializing app...</p>
+        </div>
+        
+        <!-- Language Selection Modal -->
+        <div id="language-modal" class="modal hidden">
+            <div class="modal-content text-center">
+                <h2 id="language-selection-title" class="text-xl font-bold mb-4" data-lang-key="languageSelection">Select Your Language</h2>
+                <p id="welcome-message" class="text-sm text-gray-600 mb-6" data-lang-key="welcomeMessage">Welcome to Aarogya Sahayak. Please select your preferred language.</p>
+                <select id="language-selector" class="w-full p-2 border border-gray-300 rounded-lg mb-4">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+                <button id="confirm-lang-btn" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md" data-lang-key="confirmSelection">Confirm</button>
+            </div>
+        </div>
+
+        <!-- Custom Message Box -->
+        <div id="message-box" class="modal hidden">
+            <div class="modal-content text-center">
+                <h3 id="message-box-title" class="text-xl font-bold mb-2">Message</h3>
+                <p id="message-box-content" class="text-gray-700 mb-4">Content</p>
+                <button id="message-box-close-btn" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md" onclick="hideMessageBox()">Close</button>
+            </div>
+        </div>
+        
+        <!-- App Container -->
+        <div id="app-container" class="flex flex-col h-full hidden">
+            <header class="p-4 text-center border-b border-gray-200">
+                <h1 id="app-name" class="text-2xl font-bold text-blue-600">Aarogya Sahayak</h1>
+                <p id="userId-display" class="text-xs text-gray-500 mt-1"></p>
+            </header>
+
+            <!-- Main Content Screens -->
+            <div class="screen-content">
+                <!-- Home Page -->
+                <div id="home-page" class="page">
+                    <h2 id="home-greeting" class="text-2xl font-bold mb-4 text-gray-800" data-lang-key="greeting">Namaste, User!</h2>
+                    <div id="dashboard-title" class="text-lg font-semibold mb-2 text-gray-700" data-lang-key="dashboardTitle">Your Health Dashboard</div>
+                    
+                    <!-- Vitals at a Glance Cards -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="card text-center">
+                            <i class="fas fa-tint text-red-500 text-2xl mb-2"></i>
+                            <div class="font-semibold text-lg">Blood Sugar</div>
+                            <div class="text-xl font-bold text-gray-800"><span id="last-blood-sugar">---</span> <span class="text-sm">mg/dL</span></div>
+                            <div class="text-xs text-gray-500">Last reading</div>
+                        </div>
+                        <div class="card text-center">
+                            <i class="fas fa-heartbeat text-blue-500 text-2xl mb-2"></i>
+                            <div class="font-semibold text-lg">Blood Pressure</div>
+                            <div class="text-xl font-bold text-gray-800"><span id="last-blood-pressure">---</span> <span class="text-sm">mmHg</span></div>
+                            <div class="text-xs text-gray-500">Last reading</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Buttons -->
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <button id="log-vitals-btn" class="action-button" onclick="navigateTo('vitals-page')" data-lang-key="logVitals">Log Vitals</button>
+                        <button id="connect-btn" class="action-button" onclick="navigateTo('connect-page')" data-lang-key="connect">Connect with Health Worker</button>
+                        <button id="reminders-btn" class="action-button" onclick="navigateTo('reminders-page')" data-lang-key="reminders">Reminders</button>
+                        <button id="health-feed-btn" class="action-button" onclick="navigateTo('feed-page')" data-lang-key="healthFeed">Health Feed</button>
+                    </div>
+                </div>
+
+                <!-- Vitals Logging Page -->
+                <div id="vitals-page" class="page hidden">
+                    <h2 id="vitals-title" class="text-xl font-bold mb-4" data-lang-key="vitalsTitle">Daily Vitals Logging</h2>
+                    <div class="card mb-4">
+                        <form id="vitals-form" onsubmit="event.preventDefault(); logVitals();">
+                            <div class="mb-4">
+                                <label id="blood-sugar-label" for="blood-sugar" class="block text-sm font-medium text-gray-700 mb-1" data-lang-key="bloodSugar">Blood Sugar (mg/dL)</label>
+                                <input type="number" id="blood-sugar" name="blood-sugar" placeholder="e.g., 120" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div class="mb-4">
+                                <label id="blood-pressure-label" for="systolic" class="block text-sm font-medium text-gray-700 mb-1" data-lang-key="bloodPressure">Blood Pressure (mmHg)</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label id="systolic-label" for="systolic" class="block text-xs text-gray-500" data-lang-key="systolic">Systolic</label>
+                                        <input type="number" id="systolic" name="systolic" placeholder="e.g., 120" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label id="diastolic-label" for="diastolic" class="block text-xs text-gray-500" data-lang-key="diastolic">Diastolic</label>
+                                        <input type="number" id="diastolic" name="diastolic" placeholder="e.g., 80" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="log-reading-btn" type="submit" class="w-full bg-blue-500 text-white font-bold py-2 rounded-lg" data-lang-key="logReading">Log Reading</button>
+                        </form>
+                    </div>
+                    
+                    <div class="relative min-h-[250px] mb-4">
+                        <div id="loading-vitals-overlay" class="absolute inset-0 bg-white flex items-center justify-center z-10 hidden">
+                            <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+                            <p id="loading-data" class="ml-4 text-blue-600 font-semibold">Loading Vitals...</p>
+                        </div>
+                        <canvas id="vitals-chart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Reminders Page -->
+                <div id="reminders-page" class="page hidden">
+                    <h2 id="reminders-title" class="text-xl font-bold mb-4" data-lang-key="remindersTitle">Automated Reminders</h2>
+                    <div class="card p-4">
+                        <ul id="reminders-list" class="space-y-4">
+                            <li class="flex items-center justify-between p-3 rounded-lg bg-gray-100 shadow-sm">
+                                <div class="flex items-center">
+                                    <i class="fas fa-bell text-yellow-500 mr-3"></i>
+                                    <div>
+                                        <div class="font-semibold">Take Medication (Morning)</div>
+                                        <div class="text-sm text-gray-600">Every day at 8:00 AM</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="flex items-center justify-between p-3 rounded-lg bg-gray-100 shadow-sm">
+                                <div class="flex items-center">
+                                    <i class="fas fa-pills text-teal-500 mr-3"></i>
+                                    <div>
+                                        <div class="font-semibold">Doctor's Appointment</div>
+                                        <div class="text-sm text-gray-600">Aug 20, 2024 at 10:00 AM</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <p id="no-reminders-msg" class="text-center text-gray-500 mt-4 hidden" data-lang-key="noReminders">No reminders set. Tap 'Add Reminder' to get started.</p>
+                        <button id="add-reminder-btn" class="w-full bg-blue-500 text-white font-bold py-2 rounded-lg mt-4" data-lang-key="addReminder" onclick="showMessageBox('messageBoxTitle', 'messageBoxContent')">Add Reminder</button>
+                    </div>
+                </div>
+
+                <!-- Health Worker Connect Page -->
+                <div id="connect-page" class="page hidden">
+                    <h2 id="connect-title" class="text-xl font-bold mb-4" data-lang-key="connectTitle">Connect with your Health Worker</h2>
+                    <div class="card p-4 flex flex-col items-center mb-4">
+                        <img src="https://placehold.co/100x100/A0B9D6/fff?text=Radha" alt="Radha Sharma" class="rounded-full h-24 w-24 mb-4 border-4 border-blue-200">
+                        <div class="text-center">
+                            <div class="font-bold text-lg">Radha Sharma</div>
+                            <div class="text-sm text-gray-600">ASHA Worker</div>
+                            <p id="health-worker-intro" class="mt-2 text-sm text-gray-500" data-lang-key="healthWorkerIntro">Hello, I am Radha Sharma, your dedicated ASHA worker. I am here to help you manage your health.</p>
+                        </div>
+                    </div>
+                    <!-- Chat Container -->
+                    <div id="chat-container" class="flex flex-col gap-2 p-4 bg-gray-100 rounded-lg h-64 overflow-y-auto mb-4">
+                        <p class="text-center text-gray-500 mt-4">This feature is not available in the offline version.</p>
+                    </div>
+                </div>
+
+                <!-- Personalized Health Feed Page -->
+                <div id="feed-page" class="page hidden">
+                    <h2 id="feed-title" class="text-xl font-bold mb-4" data-lang-key="feedTitle">Personalized Health Feed</h2>
+                    
+                    <!-- AI-Generated Tip Section -->
+                    <div class="card bg-blue-500 text-white text-center p-4 mb-4">
+                        <p id="personalized-tip" class="text-md font-semibold mb-2">This feature is not available in the offline version.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4">
+                        <!-- Article 1 -->
+                        <div class="card flex items-center">
+                            <img src="https://placehold.co/100x100/D0DFFF/4054FF?text=Yoga" class="rounded-lg mr-4 object-cover" alt="Yoga poses">
+                            <div>
+                                <div id="article-1-title" class="font-semibold text-blue-600" data-lang-key="feedArticle1Title">5 Easy Yoga Poses for Diabetes</div>
+                                <div id="article-1-desc" class="text-sm text-gray-600" data-lang-key="feedArticle1Desc">Learn simple exercises to help control your blood sugar.</div>
+                            </div>
+                        </div>
+                        <!-- Article 2 -->
+                        <div class="card flex items-center">
+                            <img src="https://placehold.co/100x100/FEE2E2/EF4444?text=Recipe" class="rounded-lg mr-4 object-cover" alt="Healthy Recipes">
+                            <div>
+                                <div id="article-2-title" class="font-semibold text-red-600" data-lang-key="feedArticle2Title">Healthy Recipes with Local Ingredients</div>
+                                <div id="article-2-desc" class="text-sm text-gray-600" data-lang-key="feedArticle2Desc">Delicious and healthy recipes using ingredients available locally.</div>
+                            </div>
+                        </div>
+                        <!-- Article 3 -->
+                        <div class="card flex items-center">
+                            <img src="https://placehold.co/100x100/E5E5E5/333?text=Check-up" class="rounded-lg mr-4 object-cover" alt="Doctor Checkup">
+                            <div>
+                                <div id="article-3-title" class="font-semibold text-gray-700" data-lang-key="feedArticle3Title">The Importance of Regular Check-ups</div>
+                                <div id="article-3-desc" class="text-sm text-gray-600" data-lang-key="feedArticle3Desc">Find out why consistent health check-ups are key to long-term health.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar -->
+            <nav class="bg-white border-t border-gray-200 p-2 flex justify-around items-center">
+                <button id="nav-home" class="nav-button active" data-page="home-page">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <span id="nav-home-text" class="text-xs font-medium" data-lang-key="navHome">Home</span>
+                </button>
+                <button id="nav-vitals" class="nav-button" data-page="vitals-page">
+                    <i class="fas fa-chart-line text-xl mb-1"></i>
+                    <span id="nav-vitals-text" class="text-xs font-medium" data-lang-key="navVitals">Vitals</span>
+                </button>
+                <button id="nav-reminders" class="nav-button" data-page="reminders-page">
+                    <i class="fas fa-bell text-xl mb-1"></i>
+                    <span id="nav-reminders-text" class="text-xs font-medium" data-lang-key="navReminders">Reminders</span>
+                </button>
+                <button id="nav-connect" class="nav-button" data-page="connect-page">
+                    <i class="fas fa-user-md text-xl mb-1"></i>
+                    <span id="nav-connect-text" class="text-xs font-medium" data-lang-key="navConnect">Connect</span>
+                </button>
+                <button id="nav-feed" class="nav-button" data-page="feed-page">
+                    <i class="fas fa-newspaper text-xl mb-1"></i>
+                    <span id="nav-feed-text" class="text-xs font-medium" data-lang-key="navFeed">Feed</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+    
+    <script>
+        let userId;
+        let vitalsChart;
+        let currentLanguage = 'en';
+
+        // Translation dictionary for multilingual support
+        const translations = {
+            en: {
+                appName: "Aarogya Sahayak",
+                greeting: "Namaste, User!",
+                dashboardTitle: "Your Health Dashboard",
+                logVitals: "Log Vitals",
+                connect: "Connect with Health Worker",
+                reminders: "Reminders",
+                healthFeed: "Health Feed",
+                languageSelection: "Select Your Language",
+                welcomeMessage: "Welcome to Aarogya Sahayak. Please select your preferred language.",
+                confirmSelection: "Confirm",
+                navHome: "Home",
+                navVitals: "Vitals",
+                navReminders: "Reminders",
+                navConnect: "Connect",
+                navFeed: "Feed",
+                vitalsTitle: "Daily Vitals Logging",
+                bloodSugar: "Blood Sugar (mg/dL)",
+                bloodPressure: "Blood Pressure (mmHg)",
+                systolic: "Systolic",
+                diastolic: "Diastolic",
+                logReading: "Log Reading",
+                vitalsHistory: "Vitals History",
+                remindersTitle: "Automated Reminders",
+                noReminders: "No reminders set. Tap 'Add Reminder' to get started.",
+                addReminder: "Add Reminder",
+                connectTitle: "Connect with your Health Worker",
+                healthWorkerIntro: "This feature is not available in the offline version.",
+                messageBoxTitle: "Message",
+                messageBoxContent: "Feature coming soon. This is a frontend demo.",
+                close: "Close",
+                userId: "Your User ID",
+                loggingIn: "Initializing app...",
+                loadingData: "Loading Vitals...",
+                askRadhaPlaceholder: "This feature is not available.",
+                thinking: "Thinking...",
+                tipLoading: "Fetching a tip...",
+                feedArticle1Title: "5 Easy Yoga Poses for Diabetes",
+                feedArticle1Desc: "Learn simple exercises to help control your blood sugar.",
+                feedArticle2Title: "Healthy Recipes with Local Ingredients",
+                feedArticle2Desc: "Delicious and healthy recipes using ingredients available locally.",
+                feedArticle3Title: "The Importance of Regular Check-ups",
+                feedArticle3Desc: "Find out why consistent health check-ups are key to long-term health.",
+            },
+            hi: {
+                appName: "आरोग्य सहायक",
+                greeting: "नमस्ते, User!",
+                dashboardTitle: "आपका स्वास्थ्य डैशबोर्ड",
+                logVitals: "स्वास्थ्य लॉग करें",
+                connect: "स्वास्थ्य कार्यकर्ता से जुड़ें",
+                reminders: "अनुस्मारक",
+                healthFeed: "स्वास्थ्य फ़ीड",
+                languageSelection: "अपनी भाषा चुनें",
+                welcomeMessage: "आरोग्य सहायक में आपका स्वागत है। कृपया अपनी पसंदीदा भाषा चुनें।",
+                confirmSelection: "पुष्टि करें",
+                navHome: "होम",
+                navVitals: "स्वास्थ्य",
+                navReminders: "अनुस्मारक",
+                navConnect: "जुड़ें",
+                navFeed: "फ़ीड",
+                vitalsTitle: "दैनिक स्वास्थ्य लॉगिंग",
+                bloodSugar: "रक्त शर्करा (mg/dL)",
+                bloodPressure: "रक्तचाप (mmHg)",
+                systolic: "सिस्टोलिक",
+                diastolic: "डायस्टोलिक",
+                logReading: "रीडिंग लॉग करें",
+                vitalsHistory: "स्वास्थ्य इतिहास",
+                remindersTitle: "स्वचालित अनुस्मारक",
+                noReminders: "कोई अनुस्मारक सेट नहीं है। 'अनुस्मारक जोड़ें' पर टैप करें।",
+                addReminder: "अनुस्मारक जोड़ें",
+                connectTitle: "अपने स्वास्थ्य कार्यकर्ता से जुड़ें",
+                healthWorkerIntro: "यह सुविधा ऑफ़लाइन संस्करण में उपलब्ध नहीं है।",
+                messageBoxTitle: "संदेश",
+                messageBoxContent: "यह सुविधा जल्द ही उपलब्ध होगी। यह एक फ्रंटएंड डेमो है।",
+                close: "बंद करें",
+                userId: "आपकी उपयोगकर्ता आयडी",
+                loggingIn: "ऐप शुरू हो रहा है...",
+                loadingData: "स्वास्थ्य डेटा लोड हो रहा है...",
+                askRadhaPlaceholder: "यह सुविधा उपलब्ध नहीं है।",
+                thinking: "सोच रहा है...",
+                tipLoading: "सलाह लाई जा रही है...",
+                feedArticle1Title: "मधुमेह के लिए 5 आसान योग आसन",
+                feedArticle1Desc: "अपने रक्त शर्करा को नियंत्रित करने के लिए सरल व्यायाम सीखें।",
+                feedArticle2Title: "स्थानीय सामग्रियों के साथ स्वस्थ व्यंजन",
+                feedArticle2Desc: "स्थानीय रूप से उपलब्ध सामग्रियों का उपयोग करके स्वादिष्ट और स्वस्थ व्यंजन।",
+                feedArticle3Title: "नियमित जांच-पड़ताल का महत्व",
+                feedArticle3Desc: "जानें कि लगातार स्वास्थ्य जांच क्यों महत्वपूर्ण है।",
+            },
+            mr: {
+                appName: "आरोग्य सहायक",
+                greeting: "नमस्ते, User!",
+                dashboardTitle: "तुमचा आरोग्य डॅशबोर्ड",
+                logVitals: "आरोग्य लॉग करा",
+                connect: "आरोग्य कर्मचारी सोबत कनेक्ट करा",
+                reminders: "अनुस्मारक",
+                healthFeed: "आरोग्य फीड",
+                languageSelection: "आपली भाषा निवडा",
+                welcomeMessage: "आरोग्य सहायक मध्ये आपले स्वागत आहे. कृपया तुमची पसंदीची भाषा निवडा.",
+                confirmSelection: "पुष्टी करा",
+                navHome: "मुख्यपृष्ठ",
+                navVitals: "आरोग्य",
+                navReminders: "अनुस्मारक",
+                navConnect: "जोडा",
+                navFeed: "फीड",
+                vitalsTitle: "दैनंदिन आरोग्य लॉगिंग",
+                bloodSugar: "रक्त शर्करा (mg/dL)",
+                bloodPressure: "रक्तदाब (mmHg)",
+                systolic: "सिस्टोलिक",
+                diastolic: "डायस्टोलिक",
+                logReading: "रीडिंग लॉग करा",
+                vitalsHistory: "आरोग्य इतिहास",
+                remindersTitle: "स्वयंचलित अनुस्मारक",
+                noReminders: "कोणतेही अनुस्मारक सेट नाहीत. 'अनुस्मारक जोडा' वर टॅप करा.",
+                addReminder: "अनुस्मारक जोडा",
+                connectTitle: "तुमच्या आरोग्य कर्मचारी सोबत कनेक्ट करा",
+                healthWorkerIntro: "हे वैशिष्ट्य ऑफलाइन आवृत्तीत उपलब्ध नाही.",
+                messageBoxTitle: "संदेश",
+                messageBoxContent: "हे वैशिष्ट्य लवकरच येत आहे. हे एक फ्रंटएंड डेमो आहे.",
+                close: "बंद करा",
+                userId: "तुमची वापरकर्ता आयडी",
+                loggingIn: "अॅप सुरू होत आहे...",
+                loadingData: "आरोग्य डेटा लोड होत आहे...",
+                askRadhaPlaceholder: "हे वैशिष्ट्य उपलब्ध नाही.",
+                thinking: "विचार करत आहे...",
+                tipLoading: "सलाह आणली जात आहे...",
+                feedArticle1Title: "मधुमेहासाठी 5 सोपे योगासन",
+                feedArticle1Desc: "आपले रक्त शर्करा नियंत्रित करण्यासाठी सोपे व्यायाम शिका.",
+                feedArticle2Title: "स्थानिक सामग्रीसह आरोग्यदायी पाककृती",
+                feedArticle2Desc: "स्थानिक पातळीवर उपलब्ध असलेल्या सामग्रीचा वापर करून चविष्ट आणि आरोग्यदायी पाककृती.",
+                feedArticle3Title: "नियमित तपासणीचे महत्त्व",
+                feedArticle3Desc: "जाणून घ्या की नियमित आरोग्य तपासणी दीर्घकाळ टिकणाऱ्या आरोग्यासाठी का महत्त्वाची आहे.",
+            }
+        };
+
+        // Initialize unique user ID for local storage simulation
+        if (!localStorage.getItem('userId')) {
+            localStorage.setItem('userId', 'user_' + Math.random().toString(36).substr(2, 9));
+        }
+        userId = localStorage.getItem('userId');
+
+        // Function to update all UI text based on the selected language
+        function updateUI() {
+            const lang = translations[currentLanguage];
+            document.getElementById('app-name').innerText = lang.appName;
+            document.getElementById('home-greeting').innerText = lang.greeting;
+            document.getElementById('dashboard-title').innerText = lang.dashboardTitle;
+            document.getElementById('log-vitals-btn').innerText = lang.logVitals;
+            document.getElementById('connect-btn').innerText = lang.connect;
+            document.getElementById('reminders-btn').innerText = lang.reminders;
+            document.getElementById('health-feed-btn').innerText = lang.healthFeed;
+            document.getElementById('language-selection-title').innerText = lang.languageSelection;
+            document.getElementById('welcome-message').innerText = lang.welcomeMessage;
+            document.getElementById('confirm-lang-btn').innerText = lang.confirmSelection;
+            document.getElementById('nav-home-text').innerText = lang.navHome;
+            document.getElementById('nav-vitals-text').innerText = lang.navVitals;
+            document.getElementById('nav-reminders-text').innerText = lang.navReminders;
+            document.getElementById('nav-connect-text').innerText = lang.navConnect;
+            document.getElementById('nav-feed-text').innerText = lang.navFeed;
+            document.getElementById('vitals-title').innerText = lang.vitalsTitle;
+            document.getElementById('blood-sugar-label').innerText = lang.bloodSugar;
+            document.getElementById('blood-pressure-label').innerText = lang.bloodPressure;
+            document.getElementById('systolic-label').innerText = lang.systolic;
+            document.getElementById('diastolic-label').innerText = lang.diastolic;
+            document.getElementById('log-reading-btn').innerText = lang.logReading;
+            document.getElementById('vitals-history-title').innerText = lang.vitalsHistory;
+            document.getElementById('reminders-title').innerText = lang.remindersTitle;
+            document.getElementById('no-reminders-msg').innerText = lang.noReminders;
+            document.getElementById('add-reminder-btn').innerText = lang.addReminder;
+            document.getElementById('connect-title').innerText = lang.connectTitle;
+            document.getElementById('health-worker-intro').innerText = lang.healthWorkerIntro;
+            document.getElementById('article-1-title').innerText = lang.feedArticle1Title;
+            document.getElementById('article-1-desc').innerText = lang.feedArticle1Desc;
+            document.getElementById('article-2-title').innerText = lang.feedArticle2Title;
+            document.getElementById('article-2-desc').innerText = lang.feedArticle2Desc;
+            document.getElementById('article-3-title').innerText = lang.feedArticle3Title;
+            document.getElementById('article-3-desc').innerText = lang.feedArticle3Desc;
+            document.getElementById('message-box-title').innerText = lang.messageBoxTitle;
+            document.getElementById('message-box-content').innerText = lang.messageBoxContent;
+            document.getElementById('message-box-close-btn').innerText = lang.close;
+        }
+
+        // Function to show a custom message box instead of alert()
+        function showMessageBox(title, content) {
+            document.getElementById('message-box-title').innerText = translations[currentLanguage][title] || title;
+            document.getElementById('message-box-content').innerText = translations[currentLanguage][content] || content;
+            document.getElementById('message-box').classList.remove('hidden');
+        }
+
+        // Function to hide the custom message box
+        function hideMessageBox() {
+            document.getElementById('message-box').classList.add('hidden');
+        }
+
+        // Event listener for the language selection
+        document.getElementById('confirm-lang-btn').addEventListener('click', () => {
+            const langSelector = document.getElementById('language-selector');
+            currentLanguage = langSelector.value;
+            updateUI();
+            document.getElementById('language-modal').classList.add('hidden');
+        });
+
+        // Function to handle page navigation
+        function navigateTo(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            const navButtons = document.querySelectorAll('.nav-button');
+            navButtons.forEach(button => button.classList.remove('active'));
+            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+        }
+
+        // Attach navigation listeners
+        document.getElementById('nav-home').addEventListener('click', () => navigateTo('home-page'));
+        document.getElementById('nav-vitals').addEventListener('click', () => navigateTo('vitals-page'));
+        document.getElementById('nav-reminders').addEventListener('click', () => navigateTo('reminders-page'));
+        document.getElementById('nav-connect').addEventListener('click', () => navigateTo('connect-page'));
+        document.getElementById('nav-feed').addEventListener('click', () => navigateTo('feed-page'));
+
+        // Function to log vitals to local storage
+        function logVitals() {
+            const bloodSugar = document.getElementById('blood-sugar').value;
+            const systolic = document.getElementById('systolic').value;
+            const diastolic = document.getElementById('diastolic').value;
+
+            if (!bloodSugar || !systolic || !diastolic) {
+                showMessageBox('messageBoxTitle', 'Please fill in all the fields.');
+                return;
+            }
+
+            try {
+                // Get existing vitals from local storage
+                const existingVitals = JSON.parse(localStorage.getItem('vitals')) || [];
+                
+                // Add new reading
+                existingVitals.push({
+                    bloodSugar: parseInt(bloodSugar),
+                    bloodPressure: { systolic: parseInt(systolic), diastolic: parseInt(diastolic) },
+                    timestamp: new Date().toISOString()
+                });
+
+                // Save to local storage
+                localStorage.setItem('vitals', JSON.stringify(existingVitals));
+
+                // Clear input fields
+                document.getElementById('blood-sugar').value = '';
+                document.getElementById('systolic').value = '';
+                document.getElementById('diastolic').value = '';
+                
+                showMessageBox('messageBoxTitle', 'Vitals logged successfully!');
+                navigateTo('home-page');
+                loadVitalsData();
+
+            } catch (e) {
+                console.error("Error logging vitals: ", e);
+                showMessageBox('messageBoxTitle', 'Failed to log vitals. Please try again.');
+            }
+        }
+
+        // Function to load vitals data from local storage and update the chart
+        function loadVitalsData() {
+            document.getElementById('loading-vitals-overlay').classList.remove('hidden');
+
+            const vitals = JSON.parse(localStorage.getItem('vitals')) || [];
+
+            // Sort vitals by timestamp
+            vitals.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            
+            // Process data for the chart
+            const labels = vitals.map(v => new Date(v.timestamp).toLocaleDateString());
+            const bloodSugarData = vitals.map(v => v.bloodSugar);
+            const systolicData = vitals.map(v => v.bloodPressure.systolic);
+            const diastolicData = vitals.map(v => v.bloodPressure.diastolic);
+            
+            // Update home page vitals
+            if (vitals.length > 0) {
+                const lastVitals = vitals[vitals.length - 1];
+                document.getElementById('last-blood-sugar').innerText = lastVitals.bloodSugar;
+                document.getElementById('last-blood-pressure').innerText = `${lastVitals.bloodPressure.systolic}/${lastVitals.bloodPressure.diastolic}`;
+            }
+
+            // Update the chart
+            if (vitalsChart) {
+                vitalsChart.destroy();
+            }
+            const ctx = document.getElementById('vitals-chart').getContext('2d');
+            vitalsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Blood Sugar (mg/dL)',
+                            data: bloodSugarData,
+                            borderColor: '#e53e3e',
+                            backgroundColor: 'rgba(229, 62, 62, 0.2)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Blood Pressure (Systolic)',
+                            data: systolicData,
+                            borderColor: '#3182ce',
+                            backgroundColor: 'rgba(49, 130, 206, 0.2)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Blood Pressure (Diastolic)',
+                            data: diastolicData,
+                            borderColor: '#38a169',
+                            backgroundColor: 'rgba(56, 161, 105, 0.2)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: translations[currentLanguage].vitalsHistory
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Reading'
+                            }
+                        }
+                    }
+                }
+            });
+            document.getElementById('loading-vitals-overlay').classList.add('hidden');
+        }
+
+        // Initial setup
+        window.onload = function() {
+            // Show language selection modal initially
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('language-modal').classList.remove('hidden');
+            document.getElementById('userId-display').innerText = translations[currentLanguage].userId + ": " + userId;
+            navigateTo('home-page');
+            loadVitalsData();
+        };
+    </script>
+</body>
+</html>

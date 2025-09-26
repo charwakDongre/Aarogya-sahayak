@@ -1,0 +1,244 @@
+.sign-in {
+  	width: 100%;
+  	position: relative;
+  	border-radius: 32px;
+  	background-color: #f2f5f9;
+  	height: 812px;
+  	overflow: hidden;
+  	text-align: left;
+  	font-size: 16px;
+  	color: #fff;
+  	font-family: 'Plus Jakarta Sans';
+}
+.frame {
+  	position: absolute;
+  	top: 274px;
+  	left: calc(50% - 171.5px);
+  	width: 343px;
+  	display: flex;
+  	flex-direction: column;
+  	align-items: center;
+  	gap: 32px;
+}
+.sign-in-frame {
+  	align-self: stretch;
+  	display: flex;
+  	flex-direction: column;
+  	align-items: center;
+  	gap: 32px;
+}
+.button {
+  	align-self: stretch;
+  	border-radius: 12px;
+  	background-color: #0f67fe;
+  	height: 56px;
+  	overflow: hidden;
+  	flex-shrink: 0;
+  	display: flex;
+  	align-items: center;
+  	justify-content: center;
+  	padding: 16px 28px;
+  	box-sizing: border-box;
+}
+.content {
+  	display: flex;
+  	align-items: center;
+  	gap: 12px;
+}
+.text {
+  	position: relative;
+  	letter-spacing: -0.01em;
+}
+.monotone-add-icon {
+  	width: 24px;
+  	position: relative;
+  	height: 24px;
+}
+.or {
+  	align-self: stretch;
+  	display: flex;
+  	align-items: center;
+  	gap: 8px;
+  	text-align: center;
+  	font-size: 10px;
+  	color: #5d6a85;
+}
+.vector-icon {
+  	width: 155.7px;
+  	position: relative;
+  	max-height: 100%;
+}
+.sign-in-or {
+  	position: relative;
+  	letter-spacing: 0.1em;
+  	text-transform: uppercase;
+  	font-weight: 800;
+}
+.sign-in-vector-icon {
+  	width: 154.7px;
+  	position: relative;
+  	max-height: 100%;
+}
+.socials {
+  	display: flex;
+  	align-items: flex-start;
+  	gap: 9px;
+}
+.frame-icon {
+  	width: 56px;
+  	position: relative;
+  	border-radius: 12px;
+  	height: 56px;
+  	object-fit: cover;
+}
+.sign-in-frame-icon {
+  	width: 56px;
+  	position: relative;
+  	border-radius: 12px;
+  	height: 56px;
+}
+.text2 {
+  	position: relative;
+  	font-size: 14px;
+  	letter-spacing: -0.01em;
+  	text-align: center;
+  	color: #818ba0;
+}
+.dont-have-an {
+  	font-weight: 600;
+}
+.sign-up {
+  	text-decoration: underline;
+  	font-weight: 800;
+  	color: #fa4d5e;
+}
+.home-indicator {
+  	position: absolute;
+  	bottom: 0px;
+  	left: calc(50% - 187.5px);
+  	width: 375px;
+  	height: 34px;
+}
+.sign-in-home-indicator {
+  	position: absolute;
+  	bottom: 8px;
+  	left: calc(50% - 66.5px);
+  	border-radius: 1.5px;
+  	background-color: #242e49;
+  	width: 134px;
+  	height: 5px;
+}
+.frame2 {
+  	position: absolute;
+  	top: 0px;
+  	left: 0px;
+  	border-radius: 32px;
+  	background-color: #242e49;
+  	width: 375px;
+  	height: 242px;
+  	overflow: hidden;
+  	text-align: center;
+  	font-size: 30px;
+}
+.frame3 {
+  	position: absolute;
+  	top: 84px;
+  	left: calc(50% - 163.5px);
+  	display: flex;
+  	flex-direction: column;
+  	align-items: center;
+  	gap: 12px;
+}
+.group-parent {
+  	width: 81px;
+  	position: relative;
+  	height: 80.4px;
+}
+.rectangle-parent {
+  	position: absolute;
+  	top: 24.97px;
+  	left: 0px;
+  	width: 55.5px;
+  	height: 55.5px;
+  	mix-blend-mode: normal;
+}
+.group-child {
+  	position: absolute;
+  	top: 0px;
+  	left: 0px;
+  	border-radius: 13.87px 24.97px 0px 13.87px;
+  	background-color: #fff;
+  	width: 55.5px;
+  	height: 27.7px;
+}
+.group-item {
+  	position: absolute;
+  	top: 27.74px;
+  	left: 27.74px;
+  	border-radius: 0px 0px 13.87px 13.87px;
+  	background-color: #fff;
+  	width: 27.7px;
+  	height: 27.7px;
+}
+.group-inner {
+  	position: absolute;
+  	top: 0px;
+  	left: 25.52px;
+  	width: 55.5px;
+  	height: 55.5px;
+  	object-fit: contain;
+  	mix-blend-mode: normal;
+}
+.text3 {
+  	width: 327px;
+  	position: relative;
+  	letter-spacing: -0.01em;
+  	line-height: 38px;
+  	font-weight: 800;
+  	display: inline-block;
+}
+.iphone-x-or-newer {
+  	position: absolute;
+  	top: 0px;
+  	left: calc(50% - 187.5px);
+  	width: 375px;
+  	height: 44px;
+  	overflow: hidden;
+}
+.text-icon {
+  	position: absolute;
+  	top: calc(50% - 5px);
+  	left: 34px;
+  	width: 28px;
+  	height: 11px;
+}
+.notch {
+  	position: relative;
+  	width: 0px;
+  	height: 0px;
+}
+.right-side {
+  	position: absolute;
+  	top: 17.33px;
+  	right: 14.63px;
+  	width: 66.7px;
+  	height: 11.3px;
+}
+.battery-icon {
+  	position: absolute;
+  	top: 0px;
+  	right: 0.07px;
+  	width: 24.3px;
+  	height: 11.3px;
+}
+.wifi-icon {
+  	position: relative;
+  	width: 15.3px;
+  	height: 11px;
+}
+.mobile-signal-icon {
+  	position: relative;
+  	width: 17px;
+  	height: 10.7px;
+}
+
