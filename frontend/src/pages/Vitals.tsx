@@ -19,7 +19,7 @@ export const Vitals: React.FC = () => {
     heart_rate: { icon: Heart, label: 'Heart Rate', unit: 'BPM', color: 'text-red-600' },
     blood_pressure: { icon: Activity, label: 'Blood Pressure', unit: 'mmHg', color: 'text-blue-600' },
     temperature: { icon: Thermometer, label: 'Temperature', unit: '°F', color: 'text-orange-600' },
-    weight: { icon: Weight, label: 'Weight', unit: 'lbs', color: 'text-purple-600' },
+    weight: { icon: Weight, label: 'Weight', unit: 'kg', color: 'text-purple-600' },
     glucose: { icon: Droplets, label: 'Blood Glucose', unit: 'mg/dL', color: 'text-green-600' },
   };
 
@@ -32,17 +32,63 @@ export const Vitals: React.FC = () => {
         // For now, using a dummy user ID. In a real app, this would come from auth context
         const userId = 1;
         const vitalsData = await getUserVitals(userId);
-        
-        // Transform backend data to frontend format
-        const transformedVitals = vitalsData.vitals?.map((vital: any) => ({
-          id: vital.id.toString(),
-          type: vital.vital_type,
-          value: vital.value.toString(),
-          unit: vital.unit || vitalTypes[vital.vital_type as keyof typeof vitalTypes]?.unit || '',
-          timestamp: vital.recorded_at,
-          status: vital.status || 'normal'
-        })) || [];
-        
+
+        // Transform backend vitals (VitalRecord schema) into frontend format
+        const transformedVitals: Vital[] = (vitalsData.vitals || []).flatMap((v: any) => {
+          const out: Vital[] = [];
+          const timestamp = v.recorded_at;
+          const baseId = v.id?.toString() || `${Date.now()}`;
+
+          if (v.heart_rate !== undefined && v.heart_rate !== null) {
+            out.push({
+              id: `${baseId}-hr`,
+              type: 'heart_rate',
+              value: String(v.heart_rate),
+              unit: vitalTypes.heart_rate.unit,
+              timestamp,
+              status: 'normal',
+            });
+          }
+
+          const sys = v.blood_pressure_systolic;
+          const dia = v.blood_pressure_diastolic;
+          if ((sys !== undefined && sys !== null) || (dia !== undefined && dia !== null)) {
+            const bpValue = `${sys ?? ''}${sys != null && dia != null ? '/' : ''}${dia ?? ''}`;
+            out.push({
+              id: `${baseId}-bp`,
+              type: 'blood_pressure',
+              value: bpValue,
+              unit: vitalTypes.blood_pressure.unit,
+              timestamp,
+              status: 'normal',
+            });
+          }
+
+          if (v.weight !== undefined && v.weight !== null) {
+            out.push({
+              id: `${baseId}-wt`,
+              type: 'weight',
+              value: String(v.weight),
+              unit: vitalTypes.weight.unit,
+              timestamp,
+              status: 'normal',
+            });
+          }
+
+          if (v.blood_sugar !== undefined && v.blood_sugar !== null) {
+            out.push({
+              id: `${baseId}-gl`,
+              type: 'glucose',
+              value: String(v.blood_sugar),
+              unit: vitalTypes.glucose.unit,
+              timestamp,
+              status: 'normal',
+            });
+          }
+
+          return out;
+        });
+
         setVitals(transformedVitals);
       } catch (err) {
         console.error('Error loading vitals:', err);
@@ -64,23 +110,46 @@ export const Vitals: React.FC = () => {
       // For now, using a dummy user ID. In a real app, this would come from auth context
       const userId = 1;
       
-      const vitalsData = {
-        user_id: userId,
-        vital_type: newVital.type,
-        value: parseFloat(newVital.value),
-        unit: vitalTypes[newVital.type].unit,
-        status: 'normal' // In a real app, this would be calculated based on the value
-      };
+      // Map the form input to backend schema fields
+      const payload: any = { user_id: userId };
+      if (newVital.type === 'heart_rate') {
+        const hr = parseInt(newVital.value, 10);
+        if (!isNaN(hr)) payload.heart_rate = hr;
+      } else if (newVital.type === 'blood_pressure') {
+        const parts = newVital.value.split('/');
+        const sys = parseInt(parts[0], 10);
+        const dia = parts[1] !== undefined ? parseInt(parts[1], 10) : NaN;
+        if (!isNaN(sys)) payload.blood_pressure_systolic = sys;
+        if (!isNaN(dia)) payload.blood_pressure_diastolic = dia;
+      } else if (newVital.type === 'weight') {
+        const wt = parseFloat(newVital.value);
+        if (!isNaN(wt)) payload.weight = wt;
+      } else if (newVital.type === 'glucose') {
+        const bs = parseFloat(newVital.value);
+        if (!isNaN(bs)) payload.blood_sugar = bs;
+      } else if (newVital.type === 'temperature') {
+        setError('Temperature logging is not supported yet');
+        return;
+      }
 
-      const response = await logVitals(vitalsData);
+      const response = await logVitals(payload);
       
       // Add the new vital to the local state
+      const nowIso = new Date().toISOString();
+      let displayValue = newVital.value;
+      if (newVital.type === 'blood_pressure') {
+        const parts = newVital.value.split('/');
+        const sys = parts[0] || '';
+        const dia = parts[1] || '';
+        displayValue = `${sys}${sys && dia ? '/' : ''}${dia}`;
+      }
+
       const newVitalRecord: Vital = {
-        id: response.vital?.id?.toString() || Date.now().toString(),
+        id: (response.vital?.id?.toString() || Date.now().toString()) + `-${newVital.type}`,
         type: newVital.type,
-        value: newVital.value,
+        value: displayValue,
         unit: vitalTypes[newVital.type].unit,
-        timestamp: new Date().toISOString(),
+        timestamp: nowIso,
         status: 'normal',
       };
 

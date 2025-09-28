@@ -85,7 +85,7 @@ export const Register: React.FC = () => {
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to HealthHub!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Aarogya Sahayak!</h2>
             <p className="text-gray-600 mb-8">
               Your account has been created successfully. You can now start your health journey with us.
             </p>
@@ -113,7 +113,7 @@ export const Register: React.FC = () => {
               </div>
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Create Your Account</h2>
-            <p className="text-gray-600 mt-2">Join HealthHub and start your wellness journey</p>
+            <p className="text-gray-600 mt-2">Join Aarogya Sahayak and start your wellness journey</p>
           </div>
 
           {/* Progress Indicator */}
@@ -373,75 +373,13 @@ export const Register: React.FC = () => {
                 </div>
               </>
             )}
-                  </label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      required
-                      value={formData.dateOfBirth}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="tel"
-                      name="phone"
-                      required
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
-                </div>
-
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    By creating an account, you agree to our Terms of Service and Privacy Policy. 
-                    Your health data will be kept secure and private.
-                  </p>
-                </div>
-
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      </div>
-                    ) : (
-                      'Create Account'
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
+          
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <Link to="/home" className="text-blue-600 hover:text-blue-500 font-medium">
+              <Link to="/login" className="text-blue-600 hover:text-blue-500 font-medium">
                 Sign in
               </Link>
             </p>

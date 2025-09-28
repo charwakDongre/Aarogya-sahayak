@@ -38,7 +38,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
                 <Heart className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-xl font-bold text-gray-900">HealthHub</h1>
+              <h1 className="text-xl font-bold text-gray-900">Aarogya Sahayak</h1>
             </div>
             
             {/* Desktop Navigation */}

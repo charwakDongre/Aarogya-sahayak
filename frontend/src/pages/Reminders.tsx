@@ -1,46 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Bell, Clock, CheckCircle, AlertTriangle, Calendar, Pill, Stethoscope, Dumbbell } from 'lucide-react';
 import { Reminder } from '../types';
+import { createReminder, getUserReminders, updateReminder } from '../services/api';
 
 export const Reminders: React.FC = () => {
-  const [reminders, setReminders] = useState<Reminder[]>([
-    {
-      id: '1',
-      title: 'Take morning medication',
-      description: 'Lisinopril 10mg - Take with breakfast',
-      type: 'medication',
-      dueDate: new Date(Date.now() + 7200000).toISOString(), // 2 hours from now
-      completed: false,
-      priority: 'high'
-    },
-    {
-      id: '2',
-      title: 'Doctor appointment',
-      description: 'Cardiology follow-up with Dr. Johnson',
-      type: 'appointment',
-      dueDate: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-      completed: false,
-      priority: 'medium'
-    },
-    {
-      id: '3',
-      title: 'Evening walk',
-      description: '30-minute walk around the neighborhood',
-      type: 'exercise',
-      dueDate: new Date(Date.now() + 28800000).toISOString(), // 8 hours from now
-      completed: false,
-      priority: 'low'
-    },
-    {
-      id: '4',
-      title: 'Blood pressure check',
-      description: 'Record morning blood pressure reading',
-      type: 'general',
-      dueDate: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-      completed: true,
-      priority: 'medium'
-    },
-  ]);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [newReminder, setNewReminder] = useState({
@@ -64,39 +30,117 @@ export const Reminders: React.FC = () => {
     low: 'border-l-green-500 bg-green-50',
   };
 
-  const handleAddReminder = (e: React.FormEvent) => {
+  // Load reminders on mount
+  useEffect(() => {
+    const loadReminders = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const userId = 1; // TODO: replace with real auth user id
+        const data = await getUserReminders(userId, true);
+        const transformed: Reminder[] = (data.reminders || data || []).map((r: any) => {
+          const hhmm: string | undefined = r.scheduled_time;
+          const nextTrigger: string | undefined = r.next_trigger;
+          // Build ISO date from HH:MM (today) if next_trigger not provided
+          const dueIso = nextTrigger ? nextTrigger : (() => {
+            if (!hhmm || typeof hhmm !== 'string' || !hhmm.includes(':')) {
+              return new Date().toISOString();
+            }
+            const [hStr, mStr] = hhmm.split(':');
+            const now = new Date();
+            const d = new Date(now);
+            d.setHours(Number(hStr), Number(mStr), 0, 0);
+            // if time already passed today, push to tomorrow to match backend scheduling
+            if (d.getTime() <= now.getTime()) {
+              d.setDate(d.getDate() + 1);
+            }
+            return d.toISOString();
+          })();
+          return {
+            id: (r.id ?? r.reminder_id ?? Date.now()).toString(),
+            title: r.title ?? r.name ?? 'Reminder',
+            description: r.description ?? '',
+            type: (r.reminder_type ?? r.type ?? 'general') as Reminder['type'],
+            dueDate: dueIso,
+            completed: !Boolean(r.is_active),
+            priority: (r.priority ?? 'medium') as Reminder['priority'],
+          };
+        });
+        setReminders(transformed);
+      } catch (err) {
+        console.error('Error loading reminders:', err);
+        setError('Failed to load reminders');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadReminders();
+  }, []);
+
+  const handleAddReminder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newReminder.title || !newReminder.dueDate) return;
 
-    const reminder: Reminder = {
-      id: Date.now().toString(),
-      title: newReminder.title,
-      description: newReminder.description,
-      type: newReminder.type,
-      dueDate: new Date(newReminder.dueDate).toISOString(),
-      completed: false,
-      priority: newReminder.priority,
-    };
-
-    setReminders(prev => [reminder, ...prev]);
-    setNewReminder({
-      title: '',
-      description: '',
-      type: 'general',
-      dueDate: '',
-      priority: 'medium',
-    });
-    setShowAddModal(false);
+    try {
+      setError(null);
+      const userId = 1; // TODO: replace with real auth user id
+      // Convert datetime-local to HH:MM 24h format expected by backend
+      const selected = new Date(newReminder.dueDate);
+      const hh = String(selected.getHours()).padStart(2, '0');
+      const mm = String(selected.getMinutes()).padStart(2, '0');
+      const payload = {
+        user_id: userId,
+        title: newReminder.title,
+        description: newReminder.description,
+        reminder_type: newReminder.type,
+        scheduled_time: `${hh}:${mm}`,
+        frequency: 'daily',
+        days_of_week: [],
+        language: 'hindi',
+      };
+      const res = await createReminder(payload);
+      const created: Reminder = {
+        id: (res.reminder?.id ?? Date.now()).toString(),
+        title: newReminder.title,
+        description: newReminder.description,
+        type: newReminder.type,
+        dueDate: (() => {
+          const now = new Date();
+          const d = new Date(now);
+          d.setHours(Number(hh), Number(mm), 0, 0);
+          if (d.getTime() <= now.getTime()) {
+            d.setDate(d.getDate() + 1);
+          }
+          return d.toISOString();
+        })(),
+        completed: false,
+        priority: newReminder.priority,
+      };
+      setReminders(prev => [created, ...prev]);
+      setNewReminder({ title: '', description: '', type: 'general', dueDate: '', priority: 'medium' });
+      setShowAddModal(false);
+    } catch (err) {
+      console.error('Error creating reminder:', err);
+      setError('Failed to create reminder');
+    }
   };
 
-  const toggleComplete = (id: string) => {
-    setReminders(prev =>
-      prev.map(reminder =>
-        reminder.id === id
-          ? { ...reminder, completed: !reminder.completed }
-          : reminder
-      )
-    );
+  const toggleComplete = async (id: string) => {
+    try {
+      const current = reminders.find(r => r.id === id);
+      const nextCompleted = !current?.completed;
+      // Optimistic update
+      setReminders(prev => prev.map(r => r.id === id ? { ...r, completed: nextCompleted } : r));
+      // Persist to backend if possible
+      const numericId = parseInt(id, 10);
+      if (!Number.isNaN(numericId)) {
+        // Backend tracks activity, not completion; map completed -> is_active false
+        await updateReminder(numericId, { is_active: !nextCompleted });
+      }
+    } catch (err) {
+      console.error('Error updating reminder:', err);
+      setError('Failed to update reminder');
+    }
   };
 
   const formatDueDate = (dueDate: string) => {
@@ -125,6 +169,17 @@ export const Reminders: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
+        {loading && (
+          <div className="mb-4 flex items-center text-gray-600">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span className="ml-2">Loading reminders...</span>
+          </div>
+        )}
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>

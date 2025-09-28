@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Welcome } from './pages/Welcome';
-import { Home } from './pages/Home';
+import Home from './pages/Home';
 import { Register } from './pages/Register';
+import { Login } from './pages/Login';
 import { Chat } from './pages/Chat';
 import { Vitals } from './pages/Vitals';
 import { Reminders } from './pages/Reminders';
@@ -13,7 +14,7 @@ function ApiTest() {
 
   useEffect(() => {
     // Fetch data from the Flask backend
-    fetch('http://localhost:5000/api/data')
+    fetch('http://localhost:5001/api/test')
       .then((response) => response.json())
       .then((data) => setData(data.message))
       .catch((error) => console.error('Error fetching data:', error));
@@ -36,6 +37,7 @@ function App() {
         {/* Welcome page without layout */}
         <Route path="/" element={<Welcome />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
         
         {/* Pages with layout */}
         <Route path="/home" element={

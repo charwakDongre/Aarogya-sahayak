@@ -28,8 +28,15 @@ export interface Reminder {
   description?: string;
   type: 'medication' | 'appointment' | 'exercise' | 'general';
   priority: 'high' | 'medium' | 'low';
-  scheduledTime: string;
-  isCompleted: boolean;
-  isRecurring: boolean;
-  recurringPattern?: string;
+  dueDate: string;
+  completed: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  userId: string;
+  userName: string;
+  message: string;
+  timestamp: string;
+  avatar?: string;
 }

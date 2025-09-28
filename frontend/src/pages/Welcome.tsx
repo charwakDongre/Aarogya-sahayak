@@ -41,7 +41,7 @@ export const Welcome: React.FC = () => {
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Welcome to{' '}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                HealthHub
+                Aarogya Sahayak
               </span>
             </h1>
             
@@ -115,7 +115,7 @@ export const Welcome: React.FC = () => {
             Ready to start your health journey?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of users who trust HealthHub with their wellness goals
+            Join thousands of users who trust Aarogya Sahayak with their wellness goals
           </p>
           <Link
             to="/register"

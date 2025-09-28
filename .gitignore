@@ -24,3 +24,13 @@ dist-ssr
 *.sw?
 .env
 .bolt/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
