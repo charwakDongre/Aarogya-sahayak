@@ -158,4 +158,4 @@ I designed the project to be easy to run end-to-end using standard Python and No
 * [ ] Implement secure file storage for medical records (e.g., utilizing AWS S3).
 * [ ] Add a video/telehealth consultation feature using WebRTC.
 * [ ] Build a comprehensive admin dashboard for managing users and system data.
->>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb
+
