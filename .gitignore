@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ---- General OS/Editor ----
 .DS_Store
 Thumbs.db
@@ -73,3 +74,41 @@ frontend/.vite/
 .sentryclirc
 .python-version
 .tool-versions
+=======
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.env
+.bolt/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+>>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb

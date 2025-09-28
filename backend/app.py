@@ -2,7 +2,10 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from database import init_db
 import os
+<<<<<<< HEAD
 from dotenv import load_dotenv
+=======
+>>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb
 
 # Import blueprints
 from routes.auth import auth_bp
@@ -15,6 +18,7 @@ def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     
+<<<<<<< HEAD
     # Load environment variables from a .env file if present
     # Local .env values take precedence over shell env for consistency
     load_dotenv(override=True)
@@ -35,6 +39,15 @@ def create_app(test_config=None):
             SQLALCHEMY_DATABASE_URI=db_url,
             SQLALCHEMY_TRACK_MODIFICATIONS=False,
             SQLALCHEMY_ENGINE_OPTIONS={'pool_pre_ping': True}
+=======
+    # Configure the app
+    if test_config is None:
+        # Load the instance config, if it exists, when not testing
+        app.config.from_mapping(
+            SECRET_KEY='dev',
+            SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(app.instance_path, 'aarogya_sahayak.db')),
+            SQLALCHEMY_TRACK_MODIFICATIONS=False
+>>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb
         )
     else:
         # Load the test config if passed in

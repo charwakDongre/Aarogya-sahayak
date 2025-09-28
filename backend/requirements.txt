@@ -4,5 +4,9 @@ Flask-Cors>=4.0.0
 Flask-Migrate>=4.1.0
 apscheduler>=3.11.0
 python-dateutil>=2.9.0.post0
+<<<<<<< HEAD
 psycopg2-binary>=2.9.9
 python-dotenv>=1.0.1
+=======
+psycopg2-binary>=2.9.9
+>>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb

@@ -13,8 +13,11 @@ class VitalRecord(db.Model):
     blood_pressure_diastolic = db.Column(db.Integer)  # mmHg
     weight = db.Column(db.Float)  # kg
     heart_rate = db.Column(db.Integer)  # bpm
+<<<<<<< HEAD
     temperature = db.Column(db.Float)  # Celsius
     oxygen_level = db.Column(db.Float)  # % SpO2
+=======
+>>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb
     
     # Measurement context
     measurement_time = db.Column(db.String(20))  # morning, afternoon, evening, night
@@ -34,8 +37,11 @@ class VitalRecord(db.Model):
             'blood_pressure_diastolic': self.blood_pressure_diastolic,
             'weight': self.weight,
             'heart_rate': self.heart_rate,
+<<<<<<< HEAD
             'temperature': self.temperature,
             'oxygen_level': self.oxygen_level,
+=======
+>>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb
             'measurement_time': self.measurement_time,
             'before_after_meal': self.before_after_meal,
             'notes': self.notes,
