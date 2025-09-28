@@ -1,90 +1,86 @@
-# Aarogya Sahayak
+# Aarogya Sahayak - Medical Assistance for Rural Communities
 
-## 🚀 Project Overview
-**Aarogya Sahayak** is a healthcare platform designed to provide **medical assistance in rural areas**. It bridges the gap in healthcare accessibility by connecting patients with healthcare professionals, tracking vitals, managing reminders, and facilitating communication through a chat system. This project was developed as part of the **Bit-N-Build: Around the World 2025 Hackathon** by **Hacktronics**.
+### Project Overview
+
+Healthcare access is severely limited in many rural areas, leading to delayed diagnoses and inconsistent care. **Aarogya Sahayak** is a full-stack prototype designed to provide **remote medical assistance** by connecting patients with healthcare professionals digitally. This project demonstrates my ability to integrate full-stack technologies (Flask and React), manage complex state, and apply product thinking to a high-impact social challenge. It facilitates remote consultations, vital tracking, and communication, bridging the care gap. This solution was developed as part of the **Bit-N-Build: Around the World 2025 Hackathon** by **Hacktronics**.
+
+---
+
+### Core Technology Stack
+
+* **Frontend**: React (TypeScript, Vite)
+* **Backend**: Python (Flask)
+* **Database**: SQLite (managed by SQLAlchemy)
+* **API Communication**: REST API (Flask-CORS)
+* **Deployment**: Local Virtual Environments
 
 ---
 
-## 🛠️ Tech Stack
-### **Frontend**
-- **Framework**: React (with TypeScript)
-- **Routing**: React Router
-- **Build Tool**: Vite
-- **Styling**: TailwindCSS
-- **State Management**: Context API
-- **API Communication**: Fetch API / Axios
+### Key Features (MVP)
 
-### **Backend**
-- **Framework**: Flask
-- **Database**: SQLite
-- **ORM**: SQLAlchemy
-- **Migrations**: Alembic
-- **Authentication**: Flask-Login / Flask-JWT-Extended
-- **CORS Handling**: Flask-CORS
+The prototype I built focuses on delivering essential services for remote care management:
+
+* **Secure Patient/Provider Dashboards**: Role-based access ensuring data privacy and relevant information display for both patients and healthcare workers.
+* **Vitals Tracking**: Allows users to log and track key health metrics over time, presented in a clean, chart-based interface.
+* **Medication Reminders**: Implements a reminder system to ensure patient compliance with treatment schedules.
+* **Chat System Integration**: Facilitates secure, asynchronous communication between the patient and their assigned professional.
+* **Robust Backend API**: A Flask REST API handles authentication (Flask-JWT-Extended) and secure data storage (SQLAlchemy/SQLite).
+* **API Verification Endpoint**: Includes a dedicated test endpoint (`/api/test`) to simplify debugging and ensure reliable connectivity.
 
 ---
-### 1. Clone the Repository
 
-First, clone the repository to your local machine and navigate into the project directory:
+### Local Setup & Installation
 
-```bash
-git clone [https://github.com/charwakDongre/Aarogya-sahayak.git](https://github.com/charwakDongre/Aarogya-sahayak.git)
-cd Aarogya-sahayak
+I designed the project to be easy to run end-to-end using standard Python and Node environments.
+
+**Prerequisites**
+* Git
+* Python 3.x and pip (for backend)
+* Node.js and npm (for frontend)
+
+**Step-by-step Installation**
+
+1.  **Clone the Repository**:
+    ```bash
+    git clone [https://github.com/charwakDongre/Aarogya-sahayak.git](https://github.com/charwakDongre/Aarogya-sahayak.git)
+    cd Aarogya-sahayak
+    ```
+
+2.  **Set up Backend (Flask)**:
+    * Navigate to the backend: `cd backend`
+    * Create and activate the virtual environment: `python3 -m venv venv` and `source venv/bin/activate`
+    * Install dependencies: `pip install -r requirements.txt`
+    * Run the server: `python test_app.py` (Starts on `http://localhost:5001`)
+
+3.  **Set up Frontend (React)**:
+    * Navigate to the frontend: `cd ../frontend`
+    * Install dependencies: `npm install`
+    * Run the development server: `npm run dev` (Starts on `http://localhost:5173`)
+
+4.  **Access the Application**:
+    Once both servers are running, access the application UI at **`http://localhost:5173`** and verify the backend connection at **`http://localhost:5001/api/test`**.
+
 ---
 
-### 2. Backend Setup (Flask)
+### Architectural Decisions
 
-```markdown
-### 2. Backend Setup (Flask)
+* **Flask-React Separation**: Used separate repositories (or directories) for the frontend and backend to enforce a clear **API contract** (REST) and promote modular development.
+* **Virtual Environments**: Standard practice for Python development, ensuring dependencies are isolated and portable.
+* **Type Safety (TypeScript)**: Utilizing TypeScript in the React frontend reduces runtime errors and makes the large codebase easier to maintain.
+* **SQLAlchemy ORM**: Abstracting raw SQL allows for faster development and easier database migration between SQLite (development) and a production database (e.g., PostgreSQL).
 
-The backend is built with **Flask** and Python.
+---
 
-1.  **Navigate** to the `backend` directory:
-    ```bash
-    cd backend
-    ```
+### Verification and Troubleshooting
 
-2.  **Create and activate** a virtual environment:
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate    # On Windows: venv\Scripts\activate
-    ```
+* **API Test Route**: The dedicated frontend route, **`http://localhost:5173/api-test`**, confirms that the CORS settings and API calls are functioning correctly between the React and Flask servers.
+* **Troubleshooting**: If issues arise, ensure the virtual environment is *active* before running `python app.py` and check the terminal logs for port conflicts.
 
-3.  **Install** the required dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+---
 
-4.  **Run** the Flask application:
-    ```bash
-    python app.py
-    ```
-    > The backend server will start on `http://localhost:5001`.
-### 3. Frontend Setup (React/Vue/etc.)
+### TODO.md (Future Enhancements)
 
-The frontend is built with [***Specify frontend framework, e.g., React, Vue, etc.***].
-
-1.  **Navigate** to the `frontend` directory:
-    ```bash
-    cd ../frontend
-    ```
-
-2.  **Install** the required dependencies:
-    ```bash
-    npm install
-    ```
-
-3.  **Start** the development server:
-    ```bash
-    npm run dev
-    ```
-    > The frontend application will start on `http://localhost:5173`.
-### 4. Verify the Application
-
-Open your browser and navigate to the following URLs to ensure everything is running:
-
-| Component | URL | Status Check |
-| :--- | :--- | :--- |
-| **Frontend** | `http://localhost:5173` | The main application UI should load. |
-| **Backend API** | `http://localhost:5001/api/test` | You should see a success message (e.g., JSON response). |
-
+* [ ] Integrate a true persistent database (PostgreSQL/MySQL) and containerize with Docker Compose.
+* [ ] Implement secure file storage for medical records (e.g., utilizing AWS S3).
+* [ ] Add a video/telehealth consultation feature using WebRTC.
+* [ ] Build a comprehensive admin dashboard for managing users and system data.
