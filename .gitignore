@@ -1,0 +1,75 @@
+# ---- General OS/Editor ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.eggs/
+
+# Virtual environments
+env/
+venv/
+.venv/
+backend/venv/
+
+# Test/coverage caches
+.pytest_cache/
+.tox/
+.nox/
+.mypy_cache/
+.pytype/
+.ruff_cache/
+.pylint.d/
+.coverage
+coverage.xml
+htmlcov/
+
+# Logs
+logs/
+*.log
+*.out
+*.err
+
+# ---- Flask/SQLAlchemy ----
+*.sqlite3
+*.db
+*.pid
+backend/instance/
+backend/instance/*.db
+
+# Alembic cache (keep migration scripts tracked)
+backend/migrations/versions/__pycache__/
+
+# ---- Environment files ----
+.env
+.env.*
+!/.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# ---- Node/Frontend ----
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+build/
+.cache/
+.eslintcache
+.vite/
+frontend/.vite/
+*.tsbuildinfo
+
+# ---- Misc tooling ----
+.vercel/
+.sentryclirc
+.python-version
+.tool-versions
