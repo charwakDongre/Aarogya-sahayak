@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Aarogya Sahayak
 
 ## 🚀 Project Overview
