@@ -2,7 +2,7 @@
 # Aarogya Sahayak
 
 ## 🚀 Project Overview
-**Aarogya Sahayak** is a healthcare platform designed to provide **medical assistance in rural areas**. It bridges the gap in healthcare accessibility by connecting patients with healthcare professionals, tracking vitals, managing reminders, and facilitating communication through a chat system. This project was developed as part of the **Bit-N-Build: Around the World 2025 Hackathon** by **Hacktronics**.
+Healthcare access is severely limited in many rural areas, leading to delayed diagnoses and inconsistent care. **Aarogya Sahayak** is a full-stack prototype designed to provide **remote medical assistance** by connecting patients with healthcare professionals digitally. This project demonstrates my ability to integrate full-stack technologies (Flask and React), manage complex state, and apply product thinking to a high-impact social challenge. It facilitates remote consultations, vital tracking, and communication, bridging the care gap. This solution was developed as part of the **Bit-N-Build: Around the World 2025 Hackathon** by **Hacktronics**.
 
 ---
 
@@ -72,24 +72,6 @@ Once running, the API will use PostgreSQL if `DATABASE_URL` is set.
 ---
 
 =======
-# Aarogya Sahayak - Medical Assistance for Rural Communities
-
-### Project Overview
-
-Healthcare access is severely limited in many rural areas, leading to delayed diagnoses and inconsistent care. **Aarogya Sahayak** is a full-stack prototype designed to provide **remote medical assistance** by connecting patients with healthcare professionals digitally. This project demonstrates my ability to integrate full-stack technologies (Flask and React), manage complex state, and apply product thinking to a high-impact social challenge. It facilitates remote consultations, vital tracking, and communication, bridging the care gap. This solution was developed as part of the **Bit-N-Build: Around the World 2025 Hackathon** by **Hacktronics**.
-
----
-
-### Core Technology Stack
-
-* **Frontend**: React (TypeScript, Vite)
-* **Backend**: Python (Flask)
-* **Database**: SQLite (managed by SQLAlchemy)
-* **API Communication**: REST API (Flask-CORS)
-* **Deployment**: Local Virtual Environments
-
----
-
 ### Key Features (MVP)
 
 The prototype I built focuses on delivering essential services for remote care management:
