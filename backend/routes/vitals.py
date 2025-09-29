@@ -28,11 +28,8 @@ def log_vitals():
         bp_diastolic = int(data.get('blood_pressure_diastolic')) if data.get('blood_pressure_diastolic') else None
         weight = float(data.get('weight')) if data.get('weight') else None
         heart_rate = int(data.get('heart_rate')) if data.get('heart_rate') else None
-<<<<<<< HEAD
         temperature = float(data.get('temperature')) if data.get('temperature') else None
         oxygen_level = float(data.get('oxygen_level')) if data.get('oxygen_level') else None
-=======
->>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb
 
         vital_record = VitalRecord(
             user_id=user_id,
@@ -41,11 +38,8 @@ def log_vitals():
             blood_pressure_diastolic=bp_diastolic,
             weight=weight,
             heart_rate=heart_rate,
-<<<<<<< HEAD
             temperature=temperature,
             oxygen_level=oxygen_level,
-=======
->>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb
             measurement_time=data.get('measurement_time'),
             before_after_meal=data.get('before_after_meal'),
             notes=data.get('notes'),
@@ -200,7 +194,6 @@ def get_vitals_stats(user_id):
                 'max': max(heart_rate_values),
                 'count': len(heart_rate_values)
             }
-<<<<<<< HEAD
 
         # Temperature stats
         temperature_values = [v.temperature for v in vitals if v.temperature]
@@ -221,8 +214,6 @@ def get_vitals_stats(user_id):
                 'max': max(oxygen_values),
                 'count': len(oxygen_values)
             }
-=======
->>>>>>> 110f7f08ee37048bf5360d0f857db32f5a1cecbb
         
         return jsonify({'stats': stats})
         
