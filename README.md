@@ -17,7 +17,7 @@ Healthcare access is severely limited in many rural areas, leading to delayed di
 
 ### **Backend**
 - **Framework**: Flask
-- **Database**: PostgreSQL (preferred) or SQLite (fallback)
+- **Database**: PostgreSQL 
 - **ORM**: SQLAlchemy
 - **Migrations**: Alembic
 - **Authentication**: Flask-Login / Flask-JWT-Extended
